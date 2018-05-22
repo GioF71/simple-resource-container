@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 
 import eu.giof71.resourceContainer.ResourceContainer;
 
@@ -56,23 +57,30 @@ public class SimpleResourceContainer implements ResourceContainer {
 		}
 		return resource;
 	}
-	
-	private List<Pair<Class<?>, Object>> getOrCreateList(String name) {
-		List<Pair<Class<?>, Object>> list = byName.get(name);
+
+	private <ListKeyType, FirstType> List<Pair<FirstType, Object>> getOrCreate(ListKeyType listKey, Function<SimpleResourceContainer, Map<ListKeyType, List<Pair<FirstType, Object>>>> listGetter) {
+		Map<ListKeyType, List<Pair<FirstType, Object>>> map = listGetter.apply(this);
+		List<Pair<FirstType, Object>> list = map.get(listKey);
 		if (list == null) {
 			list = new ArrayList<>();
-			byName.put(name, list);
+			map.put(listKey, list);
 		}
 		return list;
 	}
 
+
+	private List<Pair<Class<?>, Object>> getOrCreateList(String name) {
+		return getOrCreate(name, p -> p.byName);
+	}
+
 	private List<Pair<String, Object>> getOrCreateList(Class<?> type) {
-		List<Pair<String, Object>> list = byType.get(type);
-		if (list == null) {
-			list = new ArrayList<>();
-			byType.put(type, list);
-		}
-		return list;
+		return getOrCreate(type, p -> p.byType);
+//		List<Pair<String, Object>> list = byType.get(type);
+//		if (list == null) {
+//			list = new ArrayList<>();
+//			byType.put(type, list);
+//		}
+//		return list;
 	}
 
 	public <T> T get(String resourceName, Class<T> clazz) {
