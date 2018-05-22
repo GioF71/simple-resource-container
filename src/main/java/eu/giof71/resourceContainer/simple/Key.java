@@ -5,7 +5,7 @@ final class Key {
 	private final String name;
 	private final Class<?> resourceType;
 
-	public static Key valueOf(String name, Class<?> resourceType) {
+	static Key valueOf(String name, Class<?> resourceType) {
 		return new Key(name, resourceType);
 	}
 
