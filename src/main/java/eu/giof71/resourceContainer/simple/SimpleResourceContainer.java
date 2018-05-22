@@ -75,12 +75,6 @@ public class SimpleResourceContainer implements ResourceContainer {
 
 	private List<Pair<String, Object>> getOrCreateList(Class<?> type) {
 		return getOrCreate(type, p -> p.byType);
-//		List<Pair<String, Object>> list = byType.get(type);
-//		if (list == null) {
-//			list = new ArrayList<>();
-//			byType.put(type, list);
-//		}
-//		return list;
 	}
 
 	public <T> T get(String resourceName, Class<T> clazz) {
