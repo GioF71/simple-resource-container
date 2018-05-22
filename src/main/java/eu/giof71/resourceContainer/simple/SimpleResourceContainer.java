@@ -13,7 +13,7 @@ import eu.giof71.resourceContainer.ResourceContainer;
 
 public final class SimpleResourceContainer implements ResourceContainer {
 	
-	private Map<Key, Object> map = new HashMap<>();
+	private Map<Key<?>, Object> map = new HashMap<>();
 	private Map<String, List<Pair<Class<?>, Object>>> byName = new HashMap<>();
 	private Map<Class<?>, List<Pair<String, Object>>> byType = new HashMap<>();
 
@@ -48,7 +48,7 @@ public final class SimpleResourceContainer implements ResourceContainer {
 	}
 
 	public <T> T put(T resource, String resourceName, Class<T> resourceType) {
-		Key key = Key.valueOf(resourceName, resourceType);
+		Key<T> key = Key.valueOf(resourceName, resourceType);
 		if (!contains(resourceName, resourceType)) {
 			map.put(key, resource);
 			getOrCreateList(resourceName).add(Pair.valueOf(resourceType, resource));
