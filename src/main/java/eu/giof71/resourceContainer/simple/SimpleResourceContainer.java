@@ -11,7 +11,7 @@ import java.util.function.Function;
 import eu.giof71.resourceContainer.CannotFindUniqueResource;
 import eu.giof71.resourceContainer.ResourceContainer;
 
-public class SimpleResourceContainer implements ResourceContainer {
+public final class SimpleResourceContainer implements ResourceContainer {
 	
 	private Map<Key, Object> map = new HashMap<>();
 	private Map<String, List<Pair<Class<?>, Object>>> byName = new HashMap<>();
