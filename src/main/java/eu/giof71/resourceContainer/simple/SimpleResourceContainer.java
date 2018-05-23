@@ -11,11 +11,12 @@ import java.util.function.Function;
 import eu.giof71.resourceContainer.CannotFindUniqueResource;
 import eu.giof71.resourceContainer.ResourceContainer;
 
-public final class SimpleResourceContainer implements ResourceContainer {
+public final class SimpleResourceContainer<ResourceName> 
+	implements ResourceContainer<ResourceName> {
 	
-	private Map<Key<?>, Object> map = new HashMap<>();
-	private Map<String, List<Pair<Key<?>, Object>>> byName = new HashMap<>();
-	private Map<Class<?>, List<Pair<Key<?>, Object>>> byType = new HashMap<>();
+	private Map<Key<ResourceName, ?>, Object> map = new HashMap<>();
+	private Map<ResourceName, List<Pair<Key<ResourceName, ?>, Object>>> byName = new HashMap<>();
+	private Map<Class<?>, List<Pair<Key<ResourceName, ?>, Object>>> byType = new HashMap<>();
 
 	public void clear() {
 		map.clear();
@@ -26,7 +27,7 @@ public final class SimpleResourceContainer implements ResourceContainer {
 	}
 
 	@Override
-	public int sizeOf(String resourceName) {
+	public int sizeOf(ResourceName resourceName) {
 		return Optional.ofNullable(byName.get(resourceName)).map(List::size).orElse(0);
 	}
 
@@ -35,11 +36,11 @@ public final class SimpleResourceContainer implements ResourceContainer {
 		return Optional.ofNullable(byType.get(resourceType)).map(List::size).orElse(0);
 	}
 
-	public boolean contains(String resourceName, Class<?> resourceType) {
+	public boolean contains(ResourceName resourceName, Class<?> resourceType) {
 		return map.containsKey(Key.valueOf(resourceName, resourceType));
 	}
 
-	public Object put(Object resource, String name) {
+	public Object put(Object resource, ResourceName name) {
 		throw new UnsupportedOperationException("incomplete implementation");
 	}
 
@@ -47,8 +48,8 @@ public final class SimpleResourceContainer implements ResourceContainer {
 		throw new UnsupportedOperationException("incomplete implementation");
 	}
 
-	public <T> T put(T resource, String resourceName, Class<T> resourceType) {
-		Key<T> key = Key.valueOf(resourceName, resourceType);
+	public <T> T put(T resource, ResourceName resourceName, Class<T> resourceType) {
+		Key<ResourceName, T> key = Key.valueOf(resourceName, resourceType);
 		if (!contains(resourceName, resourceType)) {
 			map.put(key, resource);
 			getOrCreateList(resourceName).add(Pair.valueOf(key, resource));
@@ -61,11 +62,11 @@ public final class SimpleResourceContainer implements ResourceContainer {
 	}
 
 	private <ListKeyType> 
-	List<Pair<Key<?>, Object>> getOrCreateList(
+	List<Pair<Key<ResourceName, ?>, Object>> getOrCreateList(
 			ListKeyType listKey, 
-			Function<SimpleResourceContainer, Map<ListKeyType, List<Pair<Key<?>, Object>>>> listGetter) {
-		Map<ListKeyType, List<Pair<Key<?>, Object>>> map = listGetter.apply(this);
-		List<Pair<Key<?>, Object>> list = map.get(listKey);
+			Function<SimpleResourceContainer<ResourceName>, Map<ListKeyType, List<Pair<Key<ResourceName, ?>, Object>>>> listGetter) {
+		Map<ListKeyType, List<Pair<Key<ResourceName, ?>, Object>>> map = listGetter.apply(this);
+		List<Pair<Key<ResourceName, ?>, Object>> list = map.get(listKey);
 		if (list == null) {
 			list = new ArrayList<>();
 			map.put(listKey, list);
@@ -73,25 +74,25 @@ public final class SimpleResourceContainer implements ResourceContainer {
 		return list;
 	}
 
-	private List<Pair<Key<?>, Object>> getOrCreateList(String name) {
+	private List<Pair<Key<ResourceName, ?>, Object>> getOrCreateList(ResourceName name) {
 		return getOrCreateList(name, p -> p.byName);
 	}
 
-	private List<Pair<Key<?>, Object>> getOrCreateList(Class<?> type) {
+	private List<Pair<Key<ResourceName, ?>, Object>> getOrCreateList(Class<?> type) {
 		return getOrCreateList(type, p -> p.byType);
 	}
 
-	public <T> T get(String resourceName, Class<T> resourceType) {
+	public <T> T get(ResourceName resourceName, Class<T> resourceType) {
 		Object resource = map.get(Key.valueOf(resourceName, resourceType));
 		return resourceType.cast(resource);
 	}
 
 	@Override
 	public <T> List<T> getList(Class<T> resourceType) {
-		List<Pair<Key<?>, Object>> list = byType.get(resourceType);
+		List<Pair<Key<ResourceName, ?>, Object>> list = byType.get(resourceType);
 		if (list != null) {
 			List<T> itemList = new ArrayList<>();
-			for (Pair<Key<?>, Object> current : list) {
+			for (Pair<Key<ResourceName, ?>, Object> current : list) {
 				itemList.add(resourceType.cast(current.getSecond()));
 			}
 			return itemList;
@@ -101,11 +102,11 @@ public final class SimpleResourceContainer implements ResourceContainer {
 	}
 
 	@Override
-	public List<Object> getList(String resourceName) {
-		List<Pair<Key<?>, Object>> list = byName.get(resourceName);
+	public List<Object> getList(ResourceName resourceName) {
+		List<Pair<Key<ResourceName, ?>, Object>> list = byName.get(resourceName);
 		if (list != null) {
 			List<Object> itemList = new ArrayList<>();
-			for (Pair<Key<?>, Object> current : list) {
+			for (Pair<Key<ResourceName, ?>, Object> current : list) {
 				itemList.add(current.getSecond());
 			}
 			return itemList;
@@ -115,7 +116,7 @@ public final class SimpleResourceContainer implements ResourceContainer {
 	}
 
 	public <T> T get(Class<T> resourceClass) {
-		List<Pair<Key<?>, Object>> list = byType.get(resourceClass);
+		List<Pair<Key<ResourceName, ?>, Object>> list = byType.get(resourceClass);
 		if (list != null && list.size() == 1) {
 			return resourceClass.cast(list.get(0).getSecond());
 		} else if (list.size() > 1) {
@@ -129,8 +130,8 @@ public final class SimpleResourceContainer implements ResourceContainer {
 	}
 
 	@Override
-	public Object get(String resourceName) {
-		List<Pair<Key<?>, Object>> list = byName.get(resourceName);
+	public Object get(ResourceName resourceName) {
+		List<Pair<Key<ResourceName, ?>, Object>> list = byName.get(resourceName);
 		if (list != null && list.size() == 1) {
 			return list.get(0).getSecond();
 		} else if (list.size() > 1) {

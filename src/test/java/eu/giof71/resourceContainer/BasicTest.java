@@ -50,7 +50,7 @@ public class BasicTest {
 
 	@Test
 	public void insertAndVerify() {
-		ResourceContainer rc = new SimpleResourceContainer();
+		ResourceContainer<String> rc = new SimpleResourceContainer<>();
 		rc.put(new Type01(1, "Res01-1"), RES_NAME_01, Type01.class);
 		Assert.assertEquals(rc.size(), 1);
 		Assert.assertEquals(rc.sizeOf(Type01.class), 1);

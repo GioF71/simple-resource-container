@@ -2,19 +2,18 @@ package eu.giof71.resourceContainer;
 
 import java.util.List;
 
-public interface ResourceContainer {
+public interface ResourceContainer<ResourceName> {
 	void clear();
 	int size();
-	int sizeOf(String resourceName);
+	int sizeOf(ResourceName resourceName);
 	int sizeOf(Class<?> resourceType);
-	boolean contains(String resourceName, Class<?> resourceType);
-	Object put(Object resource, String name);
+	boolean contains(ResourceName resourceName, Class<?> resourceType);
+	Object put(Object resource, ResourceName name);
 	<T> T put(T resource, Class<? extends T> clazz);
-	<T> T put(T resource, String resourceName, Class<T> resourceType);
-	<T> T get(String resourceName, Class<T> resourceType);
+	<T> T put(T resource, ResourceName resourceName, Class<T> resourceType);
+	<T> T get(ResourceName resourceName, Class<T> resourceType);
 	<T> T get(Class<T> resourceType);
-	Object get(String resourceName);
-	
+	Object get(ResourceName resourceName);
 	<T> List<T> getList(Class<T> resourceType);
-	List<Object> getList(String resourceName);
+	List<Object> getList(ResourceName resourceName);
 }

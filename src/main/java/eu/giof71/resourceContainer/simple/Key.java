@@ -1,20 +1,20 @@
 package eu.giof71.resourceContainer.simple;
 
-final class Key<T> {
+final class Key<ResourceName, T> {
 	
-	private final String name;
+	private final ResourceName name;
 	private final Class<T> resourceType;
 
-	static <U> Key<U> valueOf(String name, Class<U> resourceType) {
+	static <R, U> Key<R, U> valueOf(R name, Class<U> resourceType) {
 		return new Key<>(name, resourceType);
 	}
 
-	private Key(String name, Class<T> resourceType) {
+	private Key(ResourceName name, Class<T> resourceType) {
 		this.name = name;
 		this.resourceType = resourceType;
 	}
 
-	public final String getName() {
+	public final ResourceName getName() {
 		return name;
 	}
 
@@ -39,7 +39,7 @@ final class Key<T> {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Key<?> other = (Key<?>) obj;
+		Key<?, ?> other = (Key<?, ?>) obj;
 		if (name == null) {
 			if (other.name != null)
 				return false;
