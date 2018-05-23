@@ -3,13 +3,13 @@ package eu.giof71.resourceContainer.simple;
 final class Key<ResourceName, T> {
 	
 	private final ResourceName name;
-	private final Class<T> resourceType;
+	private final Class<? extends T> resourceType;
 
-	static <R, U> Key<R, U> valueOf(R name, Class<U> resourceType) {
+	static <R, U> Key<R, U> valueOf(R name, Class<? extends U> resourceType) {
 		return new Key<>(name, resourceType);
 	}
 
-	private Key(ResourceName name, Class<T> resourceType) {
+	private Key(ResourceName name, Class<? extends T> resourceType) {
 		this.name = name;
 		this.resourceType = resourceType;
 	}
@@ -18,7 +18,7 @@ final class Key<ResourceName, T> {
 		return name;
 	}
 
-	public final Class<T> getResourceType() {
+	public final Class<? extends T> getResourceType() {
 		return resourceType;
 	}
 

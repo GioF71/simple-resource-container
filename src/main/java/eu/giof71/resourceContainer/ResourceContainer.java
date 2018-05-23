@@ -10,7 +10,7 @@ public interface ResourceContainer<ResourceName> {
 	boolean contains(ResourceName resourceName, Class<?> resourceType);
 	Object put(Object resource, ResourceName name);
 	<T> T put(T resource, Class<? extends T> clazz);
-	<T> T put(T resource, ResourceName resourceName, Class<T> resourceType);
+	<T> T put(T resource, ResourceName resourceName, Class<? extends T> resourceType);
 	<T> T get(ResourceName resourceName, Class<T> resourceType);
 	<T> T get(Class<T> resourceType);
 	Object get(ResourceName resourceName);

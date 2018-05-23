@@ -11,12 +11,21 @@ import java.util.function.Function;
 import eu.giof71.resourceContainer.CannotFindUniqueResource;
 import eu.giof71.resourceContainer.ResourceContainer;
 
-public final class SimpleResourceContainer<ResourceName> 
-	implements ResourceContainer<ResourceName> {
-	
+public final class SimpleResourceContainer<ResourceName> implements ResourceContainer<ResourceName> {
+
 	private Map<Key<ResourceName, ?>, Object> map = new HashMap<>();
 	private Map<ResourceName, List<Pair<Key<ResourceName, ?>, Object>>> byName = new HashMap<>();
 	private Map<Class<?>, List<Pair<Key<ResourceName, ?>, Object>>> byType = new HashMap<>();
+
+	private final Function<Class<?>, ResourceName> nameExtractor;
+
+	public SimpleResourceContainer() {
+		this.nameExtractor = null;
+	}
+
+	public SimpleResourceContainer(Function<Class<?>, ResourceName> nameExtractor) {
+		this.nameExtractor = nameExtractor;
+	}
 
 	@Override
 	public void clear() {
@@ -47,16 +56,20 @@ public final class SimpleResourceContainer<ResourceName>
 
 	@Override
 	public Object put(Object resource, ResourceName name) {
-		throw new UnsupportedOperationException("incomplete implementation");
+		return put(resource, name, resource.getClass());
 	}
 
 	@Override
-	public <T> T put(T resource, Class<? extends T> clazz) {
-		throw new UnsupportedOperationException("incomplete implementation");
+	public <T> T put(T resource, Class<? extends T> resourceType) {
+		if (nameExtractor != null) {
+			return put(resource, nameExtractor.apply(resourceType), resourceType);
+		} else {
+			throw new UnsupportedOperationException("incomplete implementation");
+		}
 	}
 
 	@Override
-	public <T> T put(T resource, ResourceName resourceName, Class<T> resourceType) {
+	public <T> T put(T resource, ResourceName resourceName, Class<? extends T> resourceType) {
 		Key<ResourceName, T> key = Key.valueOf(resourceName, resourceType);
 		if (!contains(resourceName, resourceType)) {
 			map.put(key, resource);
@@ -64,14 +77,12 @@ public final class SimpleResourceContainer<ResourceName>
 			getOrCreateList(resourceType).add(Pair.valueOf(key, resource));
 		} else {
 			// update is not supported yet
-			throw new UnsupportedOperationException("Update not supported"); 
+			throw new UnsupportedOperationException("Update not supported");
 		}
 		return resource;
 	}
 
-	private <ListKeyType> 
-	List<Pair<Key<ResourceName, ?>, Object>> getOrCreateList(
-			ListKeyType listKey, 
+	private <ListKeyType> List<Pair<Key<ResourceName, ?>, Object>> getOrCreateList(ListKeyType listKey,
 			Function<SimpleResourceContainer<ResourceName>, Map<ListKeyType, List<Pair<Key<ResourceName, ?>, Object>>>> listGetter) {
 		Map<ListKeyType, List<Pair<Key<ResourceName, ?>, Object>>> map = listGetter.apply(this);
 		List<Pair<Key<ResourceName, ?>, Object>> list = map.get(listKey);
@@ -131,9 +142,7 @@ public final class SimpleResourceContainer<ResourceName>
 			return resourceClass.cast(list.get(0).getSecond());
 		} else if (list.size() > 1) {
 			throw new CannotFindUniqueResource(
-					String.format(
-							"More than one item found for resourceType [%s]", 
-							resourceClass.getSimpleName()));
+					String.format("More than one item found for resourceType [%s]", resourceClass.getSimpleName()));
 		} else {
 			return null;
 		}
@@ -146,9 +155,7 @@ public final class SimpleResourceContainer<ResourceName>
 			return list.get(0).getSecond();
 		} else if (list.size() > 1) {
 			throw new CannotFindUniqueResource(
-					String.format(
-							"More than one item found for resourceName [%s]", 
-							resourceName));
+					String.format("More than one item found for resourceName [%s]", resourceName));
 		} else {
 			return null;
 		}

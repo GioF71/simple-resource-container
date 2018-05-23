@@ -53,7 +53,7 @@ public final class UnmodifiableResourceContainer<ResourceName>
 	}
 
 	@Override
-	public <T> T put(T resource, ResourceName resourceName, Class<T> resourceType) {
+	public <T> T put(T resource, ResourceName resourceName, Class<? extends T> resourceType) {
 		throw unsupported();
 	}
 
