@@ -8,7 +8,6 @@ public interface ResourceContainer<ResourceName> {
 	int sizeOf(ResourceName resourceName);
 	int sizeOf(Class<?> resourceType);
 	boolean contains(ResourceName resourceName, Class<?> resourceType);
-	Object put(Object resource, ResourceName name);
 	<T> T put(T resource, Class<? extends T> clazz);
 	<T> T put(T resource, ResourceName resourceName, Class<? extends T> resourceType);
 	<T> T get(ResourceName resourceName, Class<T> resourceType);

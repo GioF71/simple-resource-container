@@ -55,11 +55,6 @@ public final class SimpleResourceContainer<ResourceName> implements ResourceCont
 	}
 
 	@Override
-	public Object put(Object resource, ResourceName name) {
-		return put(resource, name, resource.getClass());
-	}
-
-	@Override
 	public <T> T put(T resource, Class<? extends T> resourceType) {
 		if (nameExtractor != null) {
 			return put(resource, nameExtractor.apply(resourceType), resourceType);
