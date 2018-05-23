@@ -1,5 +1,8 @@
 package eu.giof71.resourceContainer;
 
+import java.util.Random;
+import java.util.UUID;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -15,9 +18,9 @@ public class BasicTest {
 		private final int a;
 		private final String b;
 		
-		public Type01(int a, String b) {
-			this.a = a;
-			this.b = b;
+		public Type01() {
+			this.a = new Random().nextInt(1000);
+			this.b = UUID.randomUUID().toString();
 		}
 
 		int getA() {
@@ -34,9 +37,9 @@ public class BasicTest {
 		private final int a;
 		private final String b;
 		
-		public Type02(int a, String b) {
-			this.a = a;
-			this.b = b;
+		public Type02() {
+			this.a = new Random().nextInt(1000);
+			this.b = UUID.randomUUID().toString();
 		}
 
 		int getA() {
@@ -51,12 +54,12 @@ public class BasicTest {
 	@Test
 	public void insertAndVerify() {
 		ResourceContainer<String> rc = new SimpleResourceContainer<>();
-		rc.put(new Type01(1, "Res01-1"), RES_NAME_01, Type01.class);
+		rc.put(new Type01(), RES_NAME_01, Type01.class);
 		Assert.assertEquals(rc.size(), 1);
 		Assert.assertEquals(rc.sizeOf(Type01.class), 1);
 		Assert.assertEquals(rc.sizeOf(RES_NAME_01), 1);
 		
-		rc.put(new Type01(2, "Res02-1"), RES_NAME_02, Type01.class);
+		rc.put(new Type01(), RES_NAME_02, Type01.class);
 		Assert.assertEquals(rc.size(), 2);
 		Assert.assertEquals(rc.sizeOf(Type01.class), 2);
 		Assert.assertEquals(rc.sizeOf(RES_NAME_01), 1);
@@ -66,7 +69,7 @@ public class BasicTest {
 		Assert.assertEquals(rc.getList(RES_NAME_01).size(), 1);
 		Assert.assertEquals(rc.getList(RES_NAME_02).size(), 1);
 		
-		rc.put(new Type02(2, "Res02-2"), RES_NAME_02, Type02.class);
+		rc.put(new Type02(), RES_NAME_02, Type02.class);
 
 		Assert.assertEquals(rc.getList(Type01.class).size(), 2);
 		Assert.assertEquals(rc.getList(Type02.class).size(), 1);
