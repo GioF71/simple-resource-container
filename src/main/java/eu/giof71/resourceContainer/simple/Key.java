@@ -59,5 +59,5 @@ final class Key<T> {
 		builder.append("Key [name=").append(name).append(", resourceType=").append(resourceType).append("]");
 		return builder.toString();
 	}
-
 }
+

@@ -11,6 +11,7 @@ public class BasicTest {
 	private static final String RES_NAME_02 = "res.02";
 
 	class Type01 {
+		
 		private final int a;
 		private final String b;
 		
@@ -29,6 +30,7 @@ public class BasicTest {
 	}
 	
 	class Type02 {
+
 		private final int a;
 		private final String b;
 		
@@ -44,7 +46,6 @@ public class BasicTest {
 		String getB() {
 			return b;
 		}
-		
 	}
 
 	@Test
