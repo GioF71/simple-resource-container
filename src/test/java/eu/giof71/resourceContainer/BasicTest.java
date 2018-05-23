@@ -76,5 +76,4 @@ public class BasicTest {
 		Assert.assertEquals(rc.getList(RES_NAME_01).size(), 1);
 		Assert.assertEquals(rc.getList(RES_NAME_02).size(), 2);
 	}
-	
 }

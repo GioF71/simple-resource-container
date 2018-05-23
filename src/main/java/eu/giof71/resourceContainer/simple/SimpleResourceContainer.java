@@ -18,10 +18,14 @@ public final class SimpleResourceContainer<ResourceName>
 	private Map<ResourceName, List<Pair<Key<ResourceName, ?>, Object>>> byName = new HashMap<>();
 	private Map<Class<?>, List<Pair<Key<ResourceName, ?>, Object>>> byType = new HashMap<>();
 
+	@Override
 	public void clear() {
 		map.clear();
+		byName.clear();
+		byType.clear();
 	}
 
+	@Override
 	public int size() {
 		return map.size();
 	}
@@ -36,18 +40,22 @@ public final class SimpleResourceContainer<ResourceName>
 		return Optional.ofNullable(byType.get(resourceType)).map(List::size).orElse(0);
 	}
 
+	@Override
 	public boolean contains(ResourceName resourceName, Class<?> resourceType) {
 		return map.containsKey(Key.valueOf(resourceName, resourceType));
 	}
 
+	@Override
 	public Object put(Object resource, ResourceName name) {
 		throw new UnsupportedOperationException("incomplete implementation");
 	}
 
+	@Override
 	public <T> T put(T resource, Class<? extends T> clazz) {
 		throw new UnsupportedOperationException("incomplete implementation");
 	}
 
+	@Override
 	public <T> T put(T resource, ResourceName resourceName, Class<T> resourceType) {
 		Key<ResourceName, T> key = Key.valueOf(resourceName, resourceType);
 		if (!contains(resourceName, resourceType)) {
@@ -82,6 +90,7 @@ public final class SimpleResourceContainer<ResourceName>
 		return getOrCreateList(type, p -> p.byType);
 	}
 
+	@Override
 	public <T> T get(ResourceName resourceName, Class<T> resourceType) {
 		Object resource = map.get(Key.valueOf(resourceName, resourceType));
 		return resourceType.cast(resource);
@@ -95,7 +104,7 @@ public final class SimpleResourceContainer<ResourceName>
 			for (Pair<Key<ResourceName, ?>, Object> current : list) {
 				itemList.add(resourceType.cast(current.getSecond()));
 			}
-			return itemList;
+			return Collections.unmodifiableList(itemList);
 		} else {
 			return Collections.emptyList();
 		}
@@ -109,12 +118,13 @@ public final class SimpleResourceContainer<ResourceName>
 			for (Pair<Key<ResourceName, ?>, Object> current : list) {
 				itemList.add(current.getSecond());
 			}
-			return itemList;
+			return Collections.unmodifiableList(itemList);
 		} else {
 			return Collections.emptyList();
 		}
 	}
 
+	@Override
 	public <T> T get(Class<T> resourceClass) {
 		List<Pair<Key<ResourceName, ?>, Object>> list = byType.get(resourceClass);
 		if (list != null && list.size() == 1) {
