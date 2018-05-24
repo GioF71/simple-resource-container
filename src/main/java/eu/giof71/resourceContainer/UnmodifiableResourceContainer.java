@@ -77,4 +77,9 @@ public final class UnmodifiableResourceContainer<ResourceName>
 		return c.getList(resourceName);
 	}
 
+	@Override
+	public <T> T remove(ResourceName resourceName, Class<T> resourceType) {
+		return c.remove(resourceName, resourceType);
+	}
+
 }

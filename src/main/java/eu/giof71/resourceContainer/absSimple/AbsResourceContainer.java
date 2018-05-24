@@ -28,34 +28,34 @@ public abstract class AbsResourceContainer<ResourceName> implements ResourceCont
 	}
 
 	@Override
-	public void clear() {
+	public final void clear() {
 		map.clear();
 		byName.clear();
 		byType.clear();
 	}
 
 	@Override
-	public int size() {
+	public final int size() {
 		return map.size();
 	}
 
 	@Override
-	public int sizeOf(ResourceName resourceName) {
+	public final int sizeOf(ResourceName resourceName) {
 		return Optional.ofNullable(byName.get(resourceName)).map(List::size).orElse(0);
 	}
 
 	@Override
-	public int sizeOf(Class<?> resourceType) {
+	public final int sizeOf(Class<?> resourceType) {
 		return Optional.ofNullable(byType.get(resourceType)).map(List::size).orElse(0);
 	}
 
 	@Override
-	public boolean contains(ResourceName resourceName, Class<?> resourceType) {
+	public final boolean contains(ResourceName resourceName, Class<?> resourceType) {
 		return map.containsKey(Key.valueOf(resourceName, resourceType));
 	}
 
 	@Override
-	public <T> T put(T resource, Class<T> resourceType) {
+	public final <T> T put(T resource, Class<T> resourceType) {
 		if (nameExtractor != null) {
 			return put(resource, nameExtractor.apply(resourceType), resourceType);
 		} else {
@@ -67,7 +67,7 @@ public abstract class AbsResourceContainer<ResourceName> implements ResourceCont
 	}
 
 	@Override
-	public <T> T put(T resource, ResourceName resourceName, Class<T> resourceType) {
+	public final <T> T put(T resource, ResourceName resourceName, Class<T> resourceType) {
 		Key<ResourceName, T> key = Key.valueOf(resourceName, resourceType);
 		if (!contains(resourceName, resourceType)) {
 			map.put(key, resource);
@@ -100,13 +100,13 @@ public abstract class AbsResourceContainer<ResourceName> implements ResourceCont
 	}
 
 	@Override
-	public <T> T get(ResourceName resourceName, Class<T> resourceType) {
+	public final <T> T get(ResourceName resourceName, Class<T> resourceType) {
 		Object resource = map.get(Key.valueOf(resourceName, resourceType));
 		return resourceType.cast(resource);
 	}
 
 	@Override
-	public <T> List<T> getList(Class<T> resourceType) {
+	public final <T> List<T> getList(Class<T> resourceType) {
 		List<Pair<Key<ResourceName, ?>, Object>> list = byType.get(resourceType);
 		if (list != null) {
 			List<T> itemList = new ArrayList<>();
@@ -120,7 +120,7 @@ public abstract class AbsResourceContainer<ResourceName> implements ResourceCont
 	}
 
 	@Override
-	public List<Object> getList(ResourceName resourceName) {
+	public final List<Object> getList(ResourceName resourceName) {
 		List<Pair<Key<ResourceName, ?>, Object>> list = byName.get(resourceName);
 		if (list != null) {
 			List<Object> itemList = new ArrayList<>();
@@ -134,7 +134,7 @@ public abstract class AbsResourceContainer<ResourceName> implements ResourceCont
 	}
 
 	@Override
-	public <T> T get(Class<T> resourceClass) {
+	public final <T> T get(Class<T> resourceClass) {
 		List<Pair<Key<ResourceName, ?>, Object>> list = byType.get(resourceClass);
 		if (list != null && list.size() == 1) {
 			return resourceClass.cast(list.get(0).getSecond());
@@ -147,7 +147,7 @@ public abstract class AbsResourceContainer<ResourceName> implements ResourceCont
 	}
 
 	@Override
-	public Object get(ResourceName resourceName) {
+	public final Object get(ResourceName resourceName) {
 		List<Pair<Key<ResourceName, ?>, Object>> list = byName.get(resourceName);
 		if (list != null && list.size() == 1) {
 			return list.get(0).getSecond();
@@ -157,5 +157,49 @@ public abstract class AbsResourceContainer<ResourceName> implements ResourceCont
 		} else {
 			return null;
 		}
+	}
+	
+	private int findIndexOf(List<Pair<Key<ResourceName, ?>, Object>> list, ResourceName resourceName) {
+		int index = -1;
+		for (int i = 0; index == -1 && i < list.size(); ++i) {
+			Pair<Key<ResourceName, ?>, Object> current = list.get(i);
+			if (current.getFirst().getName().equals(resourceName)) {
+				index = i;
+			}
+		}
+		return index;
+	}
+
+	private int findIndexOf(List<Pair<Key<ResourceName, ?>, Object>> list, Class<?> resourceType) {
+		int index = -1;
+		for (int i = 0; index == -1 && i < list.size(); ++i) {
+			Pair<Key<ResourceName, ?>, Object> current = list.get(i);
+			if (current.getFirst().getResourceType().equals(resourceType)) {
+				index = i;
+			}
+		}
+		return index;
+	}
+
+	@Override
+	public final <T> T remove(ResourceName resourceName, Class<T> resourceType) {
+		Key<ResourceName, T> key = Key.valueOf(resourceName, resourceType);
+		Object item = map.get(key);
+		if (item != null) {
+			List<Pair<Key<ResourceName, ?>, Object>> listOfNames = byType.get(resourceType);
+			int rmIndexFromListOfNames = findIndexOf(listOfNames, resourceName);
+			List<Pair<Key<ResourceName, ?>, Object>> listOfTypes = byName.get(resourceName);
+			int rmIndexFromListOfTypes = findIndexOf(listOfTypes, resourceType);
+			if (rmIndexFromListOfNames != -1 && rmIndexFromListOfTypes != -1) {
+				// ok to remove
+				listOfNames.remove(rmIndexFromListOfNames);
+				listOfTypes.remove(rmIndexFromListOfTypes);
+				map.remove(key);
+			} else {
+				// cannot remove
+				throw new RuntimeException("Cannot remove!");
+			}
+		}
+		return resourceType.cast(item);
 	}
 }

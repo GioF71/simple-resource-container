@@ -76,4 +76,13 @@ public class BasicTest {
 		Assert.assertEquals(rc.getList(name01).size(), 1);
 		Assert.assertEquals(rc.getList(name02).size(), 2);
 	}
+	
+	@Test
+	public void remove() {
+		SimpleResourceContainer c = new SimpleResourceContainer();
+		Type01 item = c.put(new Type01(), "1", Type01.class);
+		Type01 removed = c.remove("1", Type01.class);
+		
+		Assert.assertSame(item, removed);
+	}
 }
