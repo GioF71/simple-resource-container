@@ -1,4 +1,4 @@
-package eu.giof71.resourceContainer.simple;
+package eu.giof71.resourceContainer.absSimple;
 
 final class Pair<F, S> {
 	
