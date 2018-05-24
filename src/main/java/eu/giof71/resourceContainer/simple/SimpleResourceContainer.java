@@ -55,7 +55,7 @@ public final class SimpleResourceContainer<ResourceName> implements ResourceCont
 	}
 
 	@Override
-	public <T> T put(T resource, Class<? extends T> resourceType) {
+	public <T> T put(T resource, Class<T> resourceType) {
 		if (nameExtractor != null) {
 			return put(resource, nameExtractor.apply(resourceType), resourceType);
 		} else {
@@ -64,7 +64,7 @@ public final class SimpleResourceContainer<ResourceName> implements ResourceCont
 	}
 
 	@Override
-	public <T> T put(T resource, ResourceName resourceName, Class<? extends T> resourceType) {
+	public <T> T put(T resource, ResourceName resourceName, Class<T> resourceType) {
 		Key<ResourceName, T> key = Key.valueOf(resourceName, resourceType);
 		if (!contains(resourceName, resourceType)) {
 			map.put(key, resource);
