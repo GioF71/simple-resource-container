@@ -55,6 +55,15 @@ public class BasicTest {
 		}
 		
 	}
+	
+	private <T> boolean contains(List<Pair<String, T>> listOfPair, Object item) {
+		for (Pair<String, T> current : listOfPair) {
+			if (current.getSecond().equals(item)) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	@Test
 	public void insertAndVerify() {
@@ -62,10 +71,12 @@ public class BasicTest {
 		final String name01 = UUID.randomUUID().toString();
 		final String name02 = UUID.randomUUID().toString();
 
-		rc.put(new Type01(), name01, Type01.class);
+		Type01 item1 = rc.put(new Type01(), name01, Type01.class);
 		Assert.assertEquals(rc.size(), 1);
 		Assert.assertEquals(rc.sizeOf(Type01.class), 1);
 		Assert.assertEquals(rc.sizeOf(name01), 1);
+		Assert.assertTrue(rc.getList(name01).contains(item1));
+		Assert.assertTrue(contains(rc.getList(Type01.class), item1));
 
 		rc.put(new Type01(), name02, Type01.class);
 		Assert.assertEquals(rc.size(), 2);
@@ -150,6 +161,9 @@ public class BasicTest {
 			Class<?> resType = checkListItem.getFirst().getSecond();
 			Object o = checkListItem.getSecond();
 			Assert.assertSame(o, c.get(resName, resType));
+			
+			Assert.assertTrue(c.getList(resName).contains(o));
+			Assert.assertTrue(contains(c.getList(resType), o));
 		}
 	}
 }
