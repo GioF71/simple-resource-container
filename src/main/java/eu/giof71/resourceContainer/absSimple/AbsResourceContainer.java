@@ -13,17 +13,13 @@ import eu.giof71.resourceContainer.ResourceContainer;
 
 public abstract class AbsResourceContainer<ResourceName> implements ResourceContainer<ResourceName> {
 
-	private Map<Key<ResourceName, ?>, Object> map = new HashMap<>();
-	private Map<ResourceName, List<Pair<Key<ResourceName, ?>, Object>>> byName = new HashMap<>();
-	private Map<Class<?>, List<Pair<Key<ResourceName, ?>, Object>>> byType = new HashMap<>();
+	private final Map<Key<ResourceName, ?>, Object> map = new HashMap<>();
+	private final Map<ResourceName, List<Pair<Key<ResourceName, ?>, Object>>> byName = new HashMap<>();
+	private final Map<Class<?>, List<Pair<Key<ResourceName, ?>, Object>>> byType = new HashMap<>();
 
 	private final Function<Class<?>, ResourceName> nameExtractor;
 
-	public AbsResourceContainer() {
-		this.nameExtractor = null;
-	}
-
-	public AbsResourceContainer(Function<Class<?>, ResourceName> nameExtractor) {
+	protected AbsResourceContainer(Function<Class<?>, ResourceName> nameExtractor) {
 		this.nameExtractor = nameExtractor;
 	}
 
