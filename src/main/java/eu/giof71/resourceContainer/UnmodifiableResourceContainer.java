@@ -2,6 +2,8 @@ package eu.giof71.resourceContainer;
 
 import java.util.List;
 
+import eu.giof71.resourceContainer.structure.Pair;
+
 public final class UnmodifiableResourceContainer<ResourceName> 
 	implements ResourceContainer<ResourceName> {
 
@@ -68,7 +70,7 @@ public final class UnmodifiableResourceContainer<ResourceName>
 	}
 
 	@Override
-	public <T> List<T> getList(Class<T> resourceType) {
+	public <T> List<Pair<ResourceName, T>> getList(Class<T> resourceType) {
 		return c.getList(resourceType);
 	}
 

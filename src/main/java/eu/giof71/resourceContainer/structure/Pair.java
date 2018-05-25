@@ -1,19 +1,19 @@
-package eu.giof71.resourceContainer.absSimple;
+package eu.giof71.resourceContainer.structure;
 
-final class Pair<F, S> {
+public final class Pair<F, S> {
 	
 	private final F first;
 	private final S second;
 	
-	static <FT, ST> Pair<FT, ST> valueOf(FT first, ST second) {
+	public static <FT, ST> Pair<FT, ST> valueOf(FT first, ST second) {
 		return new Pair<>(first, second);
 	}
 	
-	F getFirst() {
+	public F getFirst() {
 		return first;
 	}
 
-	S getSecond() {
+	public S getSecond() {
 		return second;
 	}
 

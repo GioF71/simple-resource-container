@@ -10,6 +10,7 @@ import java.util.function.Function;
 
 import eu.giof71.resourceContainer.CannotFindUniqueResource;
 import eu.giof71.resourceContainer.ResourceContainer;
+import eu.giof71.resourceContainer.structure.Pair;
 
 public abstract class AbsResourceContainer<ResourceName> implements ResourceContainer<ResourceName> {
 
@@ -102,12 +103,14 @@ public abstract class AbsResourceContainer<ResourceName> implements ResourceCont
 	}
 
 	@Override
-	public final <T> List<T> getList(Class<T> resourceType) {
+	public final <T> List<Pair<ResourceName, T>> getList(Class<T> resourceType) {
 		List<Pair<Key<ResourceName, ?>, Object>> list = byType.get(resourceType);
 		if (list != null) {
-			List<T> itemList = new ArrayList<>();
+			List<Pair<ResourceName, T>> itemList = new ArrayList<>();
 			for (Pair<Key<ResourceName, ?>, Object> current : list) {
-				itemList.add(resourceType.cast(current.getSecond()));
+				itemList.add(Pair.valueOf(
+						current.getFirst().getName(), 
+						resourceType.cast(current.getSecond())));
 			}
 			return Collections.unmodifiableList(itemList);
 		} else {

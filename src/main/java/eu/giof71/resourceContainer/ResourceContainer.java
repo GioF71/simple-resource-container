@@ -2,6 +2,8 @@ package eu.giof71.resourceContainer;
 
 import java.util.List;
 
+import eu.giof71.resourceContainer.structure.Pair;
+
 public interface ResourceContainer<ResourceName> {
 	
 	void clear();
@@ -21,6 +23,6 @@ public interface ResourceContainer<ResourceName> {
 	
 	<T> T remove(ResourceName resourceName, Class<T> resourceType);
 	
-	<T> List<T> getList(Class<T> resourceType);
+	<T> List<Pair<ResourceName, T>> getList(Class<T> resourceType);
 	List<Object> getList(ResourceName resourceName);
 }
