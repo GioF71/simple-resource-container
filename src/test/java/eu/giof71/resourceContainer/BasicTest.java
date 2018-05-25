@@ -1,5 +1,7 @@
 package eu.giof71.resourceContainer;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
@@ -7,15 +9,16 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import eu.giof71.resourceContainer.simple.SimpleResourceContainer;
+import eu.giof71.resourceContainer.structure.Pair;
 
 public class BasicTest {
 
-	class Type01 {
+	class AbsType{
 
 		private final int a;
 		private final String b;
 
-		public Type01() {
+		public AbsType() {
 			this.a = new Random().nextInt(1000);
 			this.b = UUID.randomUUID().toString();
 		}
@@ -29,23 +32,28 @@ public class BasicTest {
 		}
 	}
 
-	class Type02 {
+	class Type01 extends AbsType {
 
-		private final int a;
-		private final String b;
+		public Type01() {
+			super();
+		}
+		
+	}
+
+	class Type02 extends AbsType {
 
 		public Type02() {
-			this.a = new Random().nextInt(1000);
-			this.b = UUID.randomUUID().toString();
+			super();
 		}
+		
+	}
 
-		int getA() {
-			return a;
-		}
+	class Type03 extends AbsType {
 
-		String getB() {
-			return b;
+		public Type03() {
+			super();
 		}
+		
 	}
 
 	@Test
@@ -87,7 +95,7 @@ public class BasicTest {
 	}
 
 	@Test
-	public void replaceOne() {
+	public void insertOneReplaceOne() {
 		final SimpleResourceContainer c = new SimpleResourceContainer();
 		final String resourceName = UUID.randomUUID().toString();
 		c.put(new Type01(), resourceName, Type01.class);
@@ -101,5 +109,47 @@ public class BasicTest {
 		Assert.assertEquals(1, c.size());
 		Assert.assertEquals(1, c.sizeOf(Type01.class));
 		Assert.assertEquals(1, c.sizeOf(resourceName));
+	}
+	
+	private <T> T insert(
+					T o, 
+					String resourceName, 
+					Class<T> resourceType, 
+					SimpleResourceContainer c, 
+					List<Pair<Pair<String, Class<?>>, Object>> checkList) {
+		T putResult = c.put(o, resourceName, resourceType);
+		checkList.add(Pair.valueOf(Pair.valueOf(resourceName, resourceType), o));
+		return putResult;
+	}
+	
+	@Test
+	public void insertMultiReplaceOne() {
+		final SimpleResourceContainer c = new SimpleResourceContainer();
+		final String resourceName01 = UUID.randomUUID().toString();
+		
+		List<Pair<Pair<String, Class<?>>, Object>> checkList = new ArrayList<>();
+		
+		insert(new Type01(), resourceName01, Type01.class, c, checkList);
+		insert(new Type03(), resourceName01, Type03.class, c, checkList);
+		insert(new Type02(), resourceName01, Type02.class, c, checkList);
+
+		final String resourceName02 = UUID.randomUUID().toString();
+		
+		insert(new Type03(), resourceName02, Type03.class, c, checkList);
+		Type01 toBeUpdated = c.put(new Type01(), resourceName02, Type01.class);
+		insert(new Type02(), resourceName02, Type02.class, c, checkList);
+		
+		Type01 updated = c.put(new Type01(), resourceName02, Type01.class);
+		Type01 retrieved = c.get(resourceName02, Type01.class);
+		
+		Assert.assertSame(updated, retrieved);
+		Assert.assertNotSame(toBeUpdated, updated);
+		
+		for (Pair<Pair<String, Class<?>>, Object> checkListItem : checkList) {
+			String resName = checkListItem.getFirst().getFirst();
+			Class<?> resType = checkListItem.getFirst().getSecond();
+			Object o = checkListItem.getSecond();
+			Assert.assertSame(o, c.get(resName, resType));
+		}
 	}
 }
