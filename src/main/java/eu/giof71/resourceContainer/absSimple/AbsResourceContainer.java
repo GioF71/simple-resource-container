@@ -74,8 +74,8 @@ public abstract class AbsResourceContainer<ResourceName> implements ResourceCont
 			getOrCreateList(resourceName).add(Pair.valueOf(key, resource));
 			getOrCreateList(resourceType).add(Pair.valueOf(key, resource));
 		} else {
-			// update is not supported yet
-			throw new UnsupportedOperationException("Update not supported");
+			remove(resourceName, resourceType);
+			return put(resource, resourceName, resourceType);
 		}
 		return resource;
 	}
@@ -159,7 +159,7 @@ public abstract class AbsResourceContainer<ResourceName> implements ResourceCont
 		}
 	}
 	
-	private int findIndexOf(List<Pair<Key<ResourceName, ?>, Object>> list, ResourceName resourceName) {
+	private int indexOf(List<Pair<Key<ResourceName, ?>, Object>> list, ResourceName resourceName) {
 		int index = -1;
 		for (int i = 0; index == -1 && i < list.size(); ++i) {
 			Pair<Key<ResourceName, ?>, Object> current = list.get(i);
@@ -170,7 +170,7 @@ public abstract class AbsResourceContainer<ResourceName> implements ResourceCont
 		return index;
 	}
 
-	private int findIndexOf(List<Pair<Key<ResourceName, ?>, Object>> list, Class<?> resourceType) {
+	private int indexOf(List<Pair<Key<ResourceName, ?>, Object>> list, Class<?> resourceType) {
 		int index = -1;
 		for (int i = 0; index == -1 && i < list.size(); ++i) {
 			Pair<Key<ResourceName, ?>, Object> current = list.get(i);
@@ -187,17 +187,17 @@ public abstract class AbsResourceContainer<ResourceName> implements ResourceCont
 		Object item = map.get(key);
 		if (item != null) {
 			List<Pair<Key<ResourceName, ?>, Object>> listOfNames = byType.get(resourceType);
-			int rmIndexFromListOfNames = findIndexOf(listOfNames, resourceName);
+			int rmIndexFromListOfNames = indexOf(listOfNames, resourceName);
 			List<Pair<Key<ResourceName, ?>, Object>> listOfTypes = byName.get(resourceName);
-			int rmIndexFromListOfTypes = findIndexOf(listOfTypes, resourceType);
+			int rmIndexFromListOfTypes = indexOf(listOfTypes, resourceType);
 			if (rmIndexFromListOfNames != -1 && rmIndexFromListOfTypes != -1) {
 				// ok to remove
 				listOfNames.remove(rmIndexFromListOfNames);
 				listOfTypes.remove(rmIndexFromListOfTypes);
 				map.remove(key);
 			} else {
-				// cannot remove
-				throw new RuntimeException("Cannot remove!");
+				// corruption - cannot remove
+				throw new RuntimeException("Corrupted data structures");
 			}
 		}
 		return resourceType.cast(item);

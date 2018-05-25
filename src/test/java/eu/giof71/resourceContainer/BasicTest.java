@@ -50,9 +50,9 @@ public class BasicTest {
 
 	@Test
 	public void insertAndVerify() {
-		SimpleResourceContainer rc = new SimpleResourceContainer();
-		String name01 = UUID.randomUUID().toString();
-		String name02 = UUID.randomUUID().toString();
+		final SimpleResourceContainer rc = new SimpleResourceContainer();
+		final String name01 = UUID.randomUUID().toString();
+		final String name02 = UUID.randomUUID().toString();
 
 		rc.put(new Type01(), name01, Type01.class);
 		Assert.assertEquals(rc.size(), 1);
@@ -78,11 +78,29 @@ public class BasicTest {
 	}
 	
 	@Test
-	public void remove() {
-		SimpleResourceContainer c = new SimpleResourceContainer();
-		Type01 item = c.put(new Type01(), "1", Type01.class);
-		Type01 removed = c.remove("1", Type01.class);
+	public void removeOne() {
+		final SimpleResourceContainer c = new SimpleResourceContainer();
+		final Type01 item = c.put(new Type01(), "1", Type01.class);
+		final Type01 removed = c.remove("1", Type01.class);
 		
 		Assert.assertSame(item, removed);
 	}
+
+	@Test
+	public void replaceOne() {
+		final SimpleResourceContainer c = new SimpleResourceContainer();
+		final String resourceName = UUID.randomUUID().toString();
+		c.put(new Type01(), resourceName, Type01.class);
+		
+		final Type01 newItem = new Type01();
+		c.put(newItem, resourceName, Type01.class);
+		
+		final Type01 checkReplaced = c.get(resourceName, Type01.class);
+		Assert.assertSame(newItem, checkReplaced);
+		
+		Assert.assertEquals(1, c.size());
+		Assert.assertEquals(1, c.sizeOf(Type01.class));
+		Assert.assertEquals(1, c.sizeOf(resourceName));
+	}
+
 }
